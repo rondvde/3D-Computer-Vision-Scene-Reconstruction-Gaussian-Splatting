@@ -1,1 +1,32 @@
+## Environment Setup
+
+The project uses **gsplat**, **nerfstudio** and **opensplat**. Both must be installed before running the pipeline.
+
+After installation, activate the conda environment:
+
+```bash
+conda activate nerfstudio
+
+CREATE INPUT DIRECTORIES
+
+mkdir -p data/scene/input
+mkdir -p data/object1/input
+mkdir -p data/object2/input
+
+EXTRACT FRAMES FROM VIDEOS
+ffmpeg -i data/scene.mp4   -vf fps=5 -qscale:v 2 data/scene/input/%04d.jpg
+ffmpeg -i data/object1.mp4 -vf fps=5 -qscale:v 2 data/object1/input/%04d.jpg
+ffmpeg -i data/object2.mp4 -vf fps=5 -qscale:v 2 data/object2/input/%04d.jpg
+
+SCENE PROCESSING
+ns-process-data video --data data/scene.mp4 --output-dir data/scene
+
+OBJECT PROCESSING
+ns-process-data video --data data/object1.mp4 --output-dir data/object1
+ns-process-data video --data data/object2.mp4 --output-dir data/object2
+
+TRAINING
+ns-train opensplat --data data/scene
+ns-train opensplat --data data/object1
+ns-train opensplat --data data/object2
 
